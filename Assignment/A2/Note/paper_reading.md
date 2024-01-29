@@ -111,6 +111,23 @@ to extract the feature matrix. (for movies and users) and to estimate rating.
 [[Improved Neighborhood based Collaborative Filtering]()
 ]()
 
-QA
-
 ###
+
+QA: What is Pearson correlation coefficient:
+[Pearson correlation coefficient](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient)
+
+calculate Pearson corrleation coeeficient with Python3.
+```python3
+import numpy as np
+
+# Two example vectors
+vector1 = np.array([1, 2, 3, 4, 5])
+vector2 = np.array([2, 3, 4, 5, 6])
+
+# Calculate the Pearson correlation coefficient
+correlation_coefficient = np.corrcoef(vector1, vector2)[0, 1]
+
+print("Vector 1:", vector1)
+print("Vector 2:", vector2)
+print("Pearson correlation coefficient:", correlation_coefficient)
+```
