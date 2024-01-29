@@ -1,5 +1,5 @@
 # DAT410
-This repositories is for course DAT410/DAT278
+This repositories is for course DAT410
 
 + **Group 54**
 + **Member 1: [Hongguan Chen]()**
