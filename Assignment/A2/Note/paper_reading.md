@@ -131,3 +131,23 @@ print("Vector 1:", vector1)
 print("Vector 2:", vector2)
 print("Pearson correlation coefficient:", correlation_coefficient)
 ```
+
+QA: What is "the closely related cosine similarity" ?
+[cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity)
+
+```python3
+import numpy as np
+
+# Example vectors
+vector1 = np.array([1, 2, 3])
+vector2 = np.array([4, 5, 6])
+
+# Calculate cosine similarity
+dot_product = np.dot(vector1, vector2)
+norm_vector1 = np.linalg.norm(vector1)
+norm_vector2 = np.linalg.norm(vector2)
+
+cosine_similarity = dot_product / (norm_vector1 * norm_vector2)
+
+print(f"Cosine Similarity: {cosine_similarity}")
+```
