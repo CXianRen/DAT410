@@ -92,7 +92,7 @@ interpretability.
 - In academic literature, few authors precisely articulate the meaning of interpretability or how their proposed solutions are precisely useful.
 - The definition of interpretability is unclear, leading to claims regarding the interpretability of various models exhibiting a quasi-scientific nature.
 - Objectives and methods proposed in the literature are diverse, indicating interpretability is not a unified concept but several distinct ideas that must be clarified before progress can be made.
-
+`
 ## DESIDERATA OF INTERPRETABILITY RESEARCH 
 when and why we want a interpretation. 
 
