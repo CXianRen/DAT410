@@ -1,0 +1,12 @@
+| Iteration | European      |
+|-----------|---------------|
+| 1         | 'apos','de','la','l','le','et','européenne','les','à','des' |
+| 2         | 'apos','européenne','de','l','européen','la','union','le','et','à' |
+| 3         | 'européenne','européen','apos','de','l','la','union','le','et','à' |
+| 4         | 'européenne','européen','apos','de','l','la','union','le','et','à' |
+| 5         | 'européenne','européen','apos','l','de','la','le','union','et','d' |
+| 6         | 'européenne','européen','apos','l','de','la','le','union','d','au' |
+| 7         | 'européenne','européen','apos','l','de','le','la','au','d','à' |
+| 8         | 'européenne','européen','apos','l','de','le','la','au','d','à' |
+| 9         | 'européenne','européen','apos','l','de','le','la','au','d','à' |
+| 10        | 'européenne','européen','l','apos','de','le','la','au','d','à' |
