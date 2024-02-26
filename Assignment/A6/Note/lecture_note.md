@@ -56,6 +56,87 @@ min max R(u,\pi)
 #### Early game-playing AI
 + used human knowledge to evaluate states
 
+# Learning to play
++ two problems with large state spaces
+  + we can't explore every state
+  + we can't store the value of each state
+
++ what if we try only some actions?
+  + How do we make sure we don't leave out good ones.
 ## Monte-Carlo tree search
+### step-1: Selection
++ finding unexplored nodes - state-action pairs that haven't been tried
++ based on what we know so far, traverse down until an unexplored child node is reached 
++ traversal uses a tree policy for selection
+
+detail example see ppt page 40.
+
++ ? we know some rewards and visit, how do we traverse the tree
+  + tree policy
++ ? what is a good tree policy
+  + selecting nodes randomlu is very inefficient
+  + the statistics we collect can be used to improve selection during MCTS and the action we choose to play in the end.
+    + ? how should we balance trying new things and using knowledge
+
+#### greedy policies
++ **Problem**: this leads to no exploration
+<!-- 因为总是根据已知的选最好的，可能在次优里面有好的 -->
++ this is good when Q is a very good approximation of value, but it is not that good in most cases. 
+
+#### e-greedy policies 
++ An e-greedy polocy chooses the greedy action with probability 1-e, and a random action with probability e.
++ trades off exploration and exploitation a little.
++ **Problem**: May try an action known to be bad, by chacne
+
+#### Upper confidence bounds (UCB)
++ why have such idea? 
+  + it is based on [concentration inequalities](https://en.wikipedia.org/wiki/Concentration_inequality) 
++ Bound on the true Q-value for an action a in node v
+  + ??? how to know true Q value ? - no needed
+```math 
+  Q(v_a)_{true} \le Q_t(v_a)_{estimated} + U_t(v_a)
+```
++ see more in ppt page 52,53
+
+### step-2: expansion 
+<!-- 扩张 -->
++ Once a node has been selected, it is expanded.
++ an univisted child node is selected 
++ this is critical to avoid leaving out good moves
++ we must now evaluate this node - ???? how ???
+
+### step-3: simulation/roll-out
++ once an unvisited child node is selected, we simulate the game starting here
++ Based on a simulation policy, typically a simple random policy, we continute playing from the expansion node until a terminal node
++ At the terminal node, we know the value!
+
+### step-4: backpropagation
++ once we know the value of a terminal node, we backpropagate it through the tree
++ we update our idea of how good moves were 
++ the expanded node is marked as visited
++ statistics of nodes are updated, for example
+  + number of visists, N(v) ???? 
+  + total reward starting there, Q(v)
+
+### fiishing the search
++ MCTS is repeated until sufficient statistics have been gathered. 
+  + ???? how to know the iteration number is sufficient ??? 
+
++ choose the action corresponding to the most visited state. 
+  + ??? why 
+
+### Function approximation
++ the details of each state matter less, the more information there is. there are similarities
++ we recognize these similarities and disregard irrelevant information.
+
++ instead of storing the Q value of each node in the tree, we let a fuction approximate it. Q(s,a): the average reward after taking action a in state s.
++ we use machine learning to learn the value of states
+
++ this means:
+  + dont have to manually encode the quality of actions.
+  + dont have to explore every state to predict its value.
+
 ### Exploration/exploitation
+
+
 ## Machine learning
