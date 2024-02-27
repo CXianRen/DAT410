@@ -166,7 +166,7 @@ def print_board(board):
 ###  game loop USER VS Computer ###
 
 # game loop
-board_size = 3
+board_size = 3 # 3*3, 4*4, 5*5
 computer_fist = False
 # computer_fist = True
 
