@@ -101,6 +101,8 @@ Summary of Key Steps:
 6. An example dialog trace illustrates how slots are filled in a structured manner, with servants and demons aiding in decision-making and information retrieval.
 7. The system's strategy aims to control the conversation by aligning it with the predefined structure of frames, adjusting as needed based on client input or questions.
 
+Summary:
+
 GUS, the Frame-Driven Dialog System, confronts numerous challenges inherent in natural language processing and dialog management. These challenges include mixed initiative, indirect answers, resolving anaphora, handling sentence fragments, and adapting to conversational patterns.
 
 To tackle mixed initiative, where the conversation's initiative shifts between system and user, GUS employs a mixed-initiative approach, allowing both parties to take turns leading the dialogue. Indirect answers, which often complicate understanding, are simplified by GUS through careful interpretation and processing.
