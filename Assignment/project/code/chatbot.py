@@ -35,7 +35,8 @@ if Test:
     get_possible_symptoms_of_disease, \
     get_symptoms_from_text, \
     get_duration_from_text, \
-    get_symptoms_severity_duration_from_text
+    get_symptoms_severity_duration_from_text, \
+    get_yes_or_not
 
 
 # def mock_get_user_input():
@@ -44,11 +45,22 @@ if Test:
 
 def get_user_input():
     # read input from terminal
-    user_input = input("Patient: ")
+    user_input = input("You: ")
     return user_input
 
 
+def put_bot_response(response):
+    print(response)
 
+
+# load the pattern list from json file
+pattern_list = {}
+import json
+with open("../data/patterns.json", "r") as f:
+    pattern_list = json.load(f)
+
+
+import random
 
 class mDoctorBot():
     def __init__(self):
@@ -58,15 +70,20 @@ class mDoctorBot():
         self.symptoms_duration = []
 
         self.possible_disease = []
+        self.rejected_symptoms = []
         
         self.history_text = []
         
         self.next_state = 0
 
+    def __mprint(self, msg):
+      self.history_text.append(msg)
+      put_bot_response(msg)
+      
     def state_0(self):
         # greeting
         self.state = 0
-        print("Doctor: Good morning, how can I help you today?")
+        self.__mprint("Doctor: " + random.choice(pattern_list["state_0_1"]))
         self.next_state = 1
 
     def state_1(self):
@@ -81,7 +98,7 @@ class mDoctorBot():
             return
         
         if self.symptoms_duration == []:
-            print("Doctor: I see. How long have you been feeling this way?")
+            self.__mprint("Doctor: " + random.choice(pattern_list["state_1_1"]))
             self.next_state = 3
             return
         
@@ -89,8 +106,7 @@ class mDoctorBot():
      
     def state_2(self):
         self.state = 2
-        print("Doctor: Sorry, I didn't catch that. Can you tell me about your symptoms?")
-        print("Dotcor: Like fever, vomiting, etc.")
+        self.__mprint("Doctor: " + random.choice(pattern_list["state_2_1"]))
         self.next_state = 1
         
     def state_3(self):
@@ -99,7 +115,7 @@ class mDoctorBot():
         input_text = get_user_input()
         self.history_text.append(input_text)
         self.symptoms_duration = get_duration_from_text(input_text)
-        print("[DEBUG] self.symptoms_duration: ", self.symptoms_duration)
+        print("\t\t\t\t[DEBUG] self.symptoms_duration: ", self.symptoms_duration)
         if self.symptoms_duration == []:
             self.next_state = 4
             return
@@ -108,7 +124,7 @@ class mDoctorBot():
         
     def state_4(self):
         self.state = 4
-        print("Doctor: Sorry, I didn't catch that. Can you tell me about how long you've been feeling this way?")
+        self.__mprint("Doctor: " + random.choice(pattern_list["state_4_1"]))
         self.next_state = 3
 
     def state_5(self):
@@ -116,20 +132,22 @@ class mDoctorBot():
         self.state = 5
         
         self.possible_disease = get_possible_disease_with_symptoms(self.symptoms)
-        print("[DEBUG] self.possible_disease: ", self.possible_disease)
+        print("\t\t\t\t[DEBUG] self.possible_disease: ", self.possible_disease)
         if self.possible_disease == []:
-            print("Doctor: Have you been experiencing any other symptoms, like fever or vomiting?")
+            self.__mprint("Doctor: "+ random.choice(pattern_list["state_5_1"]))
             self.next_state = 6
             return
         
         # check the possible disease:
         # if there are more than one possible disease
         if self.possible_disease[0][1] < 0.5:
-            print("Doctor: Great, I have some ideas, but I need to ask you a few more questions to be sure.")
-            self.next_state = 7
+            self.__mprint("Doctor: " + random.choice(pattern_list["state_5_2"]))
+            self.next_state = 8
             return
-        # todo
- 
+        
+        self.next_state = None
+        # check 
+
     def state_6(self):
         self.state = 6
         input_text = get_user_input()
@@ -138,20 +156,54 @@ class mDoctorBot():
         if new_symptoms == []:
             self.next_state = 7
             return
-        
+        self.symptoms.append(new_symptoms)
         self.next_state = 5
 
     def state_7(self):
         self.state = 7
-        print("Doctor: Sorry, I didn't catch that. Can you tell me about any other symptoms you might be experiencing?")
+        self.__mprint("Doctor: " + random.choice(pattern_list["state_7_1"]))
         self.next_state = 6
+
+    def state_8(self):
+        self.state = 8 
+        if len(self.symptoms) + len(self.rejected_symptoms)> 5:
+            # get the conclusion
+          self.next_state = None
+
+        symptoms_of_disease = get_possible_symptoms_of_disease(self.possible_disease[0][0])
+        symptom_to_ask = None
+        for s in symptoms_of_disease:
+            if s not in self.symptoms and s not in self.rejected_symptoms:
+                symptom_to_ask = s
+                break
+        
+        print("\t\t\t\t[DEBUG] symptoms_of_disease: ", symptoms_of_disease)
+        print("\t\t\t\t[DEBUG] self.symptoms: ", self.symptoms)
+        print("\t\t\t\t[DEBUG] self.rejected_symptoms: ", self.rejected_symptoms)
+        print("\t\t\t\t[DEBUG] symptom_to_ask: ", symptom_to_ask)
+      
+        if self.possible_disease[0][1]<0.5 and symptom_to_ask is not None:
+        # ask more question to improve the score  if possible
+            self.__mprint("Doctor: %s %s" %(random.choice(pattern_list["state_8_1"]), symptom_to_ask))
+            while True:
+                input_text = get_user_input()
+                self.history_text.append(input_text)
+                if get_yes_or_not(input_text):
+                    self.symptoms.append(symptom_to_ask)
+                    break
+                else:
+                    self.rejected_symptoms.append(symptom_to_ask)
+                    break
+            # check again  
+            self.next_state = 8
+            return
+        self.next_state = None
 
     def run(self):
         while(self.next_state!=None):
           eval("self.state_"+str(self.next_state) + "()")
-
+        self.__mprint("Doctor: %s %s" % ((random.choice(pattern_list["conclusion"]), self.possible_disease)))
 
 if __name__ == "__main__":
     bot = mDoctorBot()
     bot.run()
-    print("Goodbye!")
