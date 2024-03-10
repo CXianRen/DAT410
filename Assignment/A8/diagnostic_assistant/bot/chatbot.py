@@ -25,13 +25,12 @@
 # greeting
 (11) Doctor: You're welcome. I'll have my nurse set up the tests for you. We'll go from there.
 """
-Test = False
-
-if __name__ == "__main__":
-    Test = True 
+Test = True
 
 if Test:
   # import the mock functions
+  import sys
+  sys.path.append('.')
   from model.ai_mock import \
     get_possible_disease_with_symptoms, \
     get_possible_symptoms_of_disease, \
@@ -40,12 +39,15 @@ if Test:
     get_symptoms_severity_duration_from_text, \
     get_yes_or_not
 
-
+import os
 import json
 import random
 
 class mDoctorBot():
-    def __init__(self, pattern_path = "../../data/patterns.json"):
+    def __init__(self, pattern_path = \
+            os.path.join(os.path.dirname(
+                os.path.abspath(__file__)),
+                "patterns.json")):
         self.symptoms = []
         self.symptoms_severity = []
         self.symptoms_duration = []
@@ -56,7 +58,7 @@ class mDoctorBot():
         self.output_text = None
         self.next_state = 0
     
-        with open("../data/patterns.json", "r") as f:
+        with open(pattern_path, "r") as f:
             self.pattern_list = json.load(f)
 
     def __mprint(self, msg):

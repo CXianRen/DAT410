@@ -2,8 +2,10 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton, QGroupBox, QLabel
 from PyQt5.QtGui import QFont
 
-class ChatBot():
+sys.path.append('.')
+from bot.chatbot import mDoctorBot
 
+class ChatBot():
     def get_response(self, input):
         return "Test"
 
@@ -59,7 +61,7 @@ class ChatBotGUI(QWidget):
 
 def main():
     app = QApplication(sys.argv)
-    window = ChatBotGUI()
+    window = ChatBotGUI(chatbot=mDoctorBot())
     window.show()
     sys.exit(app.exec_())
 
