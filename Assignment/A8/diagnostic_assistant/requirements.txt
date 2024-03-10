@@ -1,3 +1,4 @@
 scikit-learn
 pandas
+numpy
 PyQt5==5.15.4
