@@ -1,0 +1,109 @@
+{
+  "state_0_1": [
+    "Good morning! What brings you in today?",
+    "Hello there! How may I assist you this morning?",
+    "Good day! How may I be of service to you today?",
+    "Good morning! What can I do for you today?",
+    "Hello! How can I help you today?",
+    "Good day! What brings you in today?",
+    "Hello there! How may I assist you today?",
+    "Good morning! How can I help you today?",
+    "Hi there! How can I be of assistance to you today?"
+  ],
+  "state_1_1": [
+    "I understand. How long have you been experiencing these symptoms?",
+    "I see. Can you tell me how long you've been feeling this way?",
+    "Alright. How long have you been feeling like this?",
+    "I understand your situation. Can you tell me how long this has been going on?",
+    "I see. Can you give me an idea of how long you've been feeling like this?",
+    "Got it. Can you provide some information about how long you've been feeling this way?",
+    "Okay. How long has this been going on?",
+    "Understood. Can you tell me for how long you've been experiencing these symptoms?",
+    "I see. Can you tell me about the duration of your symptoms?",
+    "Alright. How long has this been a concern for you?"
+  ],
+  "state_2_1": [
+    "I apologize, could you please describe your symptoms to me? For example, any fever, vomiting, or other concerns?",
+    "I'm sorry, I didn't quite catch that. Could you let me know about any symptoms you're experiencing? Such as fever, vomiting, or anything else?",
+    "I'm sorry, I didn't understand. Can you tell me about any symptoms you're having? Like fever, vomiting, or any other issues?",
+    "I'm sorry, I didn't hear you clearly. Can you describe your symptoms for me? Things like fever, vomiting, or any other discomfort?",
+    "I'm sorry, I missed that. Can you please tell me about any symptoms you're experiencing? Such as fever, vomiting, or any other concerns?",
+    "Apologies, could you repeat that? Can you tell me about any symptoms you're having? Like fever, vomiting, or any other issues?",
+    "I'm sorry, I didn't catch that. Can you describe any symptoms you're experiencing? Such as fever, vomiting, or any other discomfort?",
+    "Sorry, could you provide more information? Can you describe any symptoms you're having? Like fever, vomiting, or any other issues?",
+    "Sorry, I didn't quite get that. Can you describe your symptoms for me? Such as fever, vomiting, or any other discomfort?",
+    "I'm sorry, can you please repeat that? Can you tell me about any symptoms you're experiencing? Like fever, vomiting, or any other concerns?"
+  ],
+  "state_4_1":[
+    "I apologize, I didn't quite hear that. Can you please provide some information about how long you've been feeling like this?",
+    "I'm sorry, I didn't catch that. Could you tell me how long you've been experiencing these symptoms?",
+    "My apologies, I didn't quite understand. Can you let me know for how long you've been feeling this way?",
+    "Sorry, could you repeat that? How long have you been feeling like this?",
+    "I didn't quite catch that. Can you give me an idea of how long you've been experiencing these symptoms?",
+    "Sorry, I missed that. Can you provide some information about the duration of your symptoms?",
+    "I didn't quite hear you. Can you please tell me about the duration of your symptoms?",
+    "Could you repeat that please? How long have you been feeling this way?",
+    "I'm sorry, can you clarify? How long have you been experiencing these symptoms?",
+    "Sorry, I didn't hear that clearly. Can you tell me how long you've been feeling this way?"
+  ],
+  "state_5_1":[
+    "Have you noticed any other symptoms, such as fever or vomiting?",
+    "Are there any other symptoms you've been experiencing, like fever or vomiting?",
+    "Have you had any other symptoms, like fever or vomiting?",
+    "Have you been having any other symptoms, such as fever or vomiting?",
+    "Are there any additional symptoms you've been having, like fever or vomiting?",
+    "Have you experienced any other symptoms aside from what you've mentioned, such as fever or vomiting?",
+    "Have you noticed any other symptoms besides the ones you mentioned, like fever or vomiting?",
+    "Have you been troubled by any other symptoms, such as fever or vomiting?",
+    "Do you have any other symptoms, like fever or vomiting, besides what you mentioned?",
+    "Have you been dealing with any other symptoms, like fever or vomiting, in addition to what you mentioned?"
+  ],
+  "state_5_2":[
+    "Alright, I have some initial thoughts, but I'll need to ask you a few more questions to confirm.",
+    "Okay, I have some preliminary ideas, but I'll need to ask you a few more questions to confirm my diagnosis.",
+    "Got it, I have some initial thoughts, but I'll need to ask a few more questions to make sure.",
+    "Understood, I have some ideas in mind, but I'll need to ask a few more questions to ensure accuracy.",
+    "Okay, I have some initial impressions, but I'll need to ask you a few more questions to verify.",
+    "Excellent, I have some initial hypotheses, but I'll need to ask a few more questions to confirm.",
+    "Alright, I have some preliminary ideas, but I'll need to gather a bit more information to be certain.",
+    "Okay, I have some initial thoughts, but I'll need to delve a bit deeper with a few more questions.",
+    "Got it, I have some initial insights, but I'll need to ask a few more questions to solidify my understanding.",
+    "I understand, I have some initial considerations, but I'll need to ask a few more questions to confirm my suspicions."
+  ],
+  "state_7_1":[
+    "I'm sorry, could you please describe any other symptoms you might be experiencing?",
+    "Apologies, I didn't quite catch that. Can you let me know about any other symptoms you might have?",
+    "My apologies, I didn't quite hear that. Could you tell me about any other symptoms you might be dealing with?",
+    "Sorry, I missed that. Can you describe any other symptoms you might be experiencing?",
+    "I didn't quite catch that. Can you provide information about any other symptoms you might be having?",
+    "Sorry, could you repeat that please? Can you tell me about any other symptoms you might be experiencing?",
+    "I'm sorry, I didn't catch that. Can you let me know about any other symptoms you might be experiencing?",
+    "Apologies, could you clarify? Can you tell me about any other symptoms you might be experiencing?",
+    "Sorry, I didn't quite hear that. Can you describe any other symptoms you might be experiencing?",
+    "I'm sorry, could you please repeat that? Can you tell me about any other symptoms you might be experiencing?"
+  ],
+  "state_8_1":[
+    "Do you experience any ",
+    "Have you noticed any ",
+    "Are you feeling any ",
+    "Have you had any sensations of ",
+    "Do you have any symptoms suggestive of ",
+    "Have you felt any signs of ",
+    "Are you exhibiting any signs of ",
+    "Have you had any sensations like ",
+    "Do you have any symptoms resembling ",
+    "Are there any feelings of "
+  ],
+  "conclusion":[
+    "Alright, here's the conclusion.",
+    "Okay, let me summarize the conclusion for you.",
+    "Understood, I'll now provide you with the conclusion.",
+    "Got it, here's what we've concluded.",
+    "Sure, let me give you the conclusion.",
+    "Of course, here's the conclusion.",
+    "Certainly, allow me to present the conclusion.",
+    "Understood, here's the conclusion as I see it.",
+    "Absolutely, here's the conclusion I've arrived at.",
+    "Certainly, here's the conclusion based on our discussion."
+  ]
+}

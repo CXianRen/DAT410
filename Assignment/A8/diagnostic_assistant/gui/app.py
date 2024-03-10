@@ -9,10 +9,10 @@ class ChatBot():
 
 
 class ChatBotGUI(QWidget):
-    def __init__(self):
+    def __init__(self, chatbot=ChatBot()):
         super().__init__()
         self.setWindowTitle('Diagnostic Assistant')
-        self.chatbot = ChatBot()
+        self.chatbot = chatbot
         #self.trainer = ChatterBotCorpusTrainer(self.chatbot)
         #self.trainer.train('chatterbot.corpus.english')  # Train the chatbot on English corpus
 
