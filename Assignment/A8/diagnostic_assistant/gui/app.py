@@ -66,10 +66,8 @@ class ChatBotGUI(QWidget):
             agent = DiagnosticAgent()
 
             matching_symptoms = agent.ask_matching_symptoms(symptoms)
-            self.chat_display.append(f'Bot: Did you mean you have {" and ".join(matching_symptoms)}, if so, ')
-
             disease = agent.ask_disease(symptoms)
-            self.chat_display.append(f'you might have {" or ".join(disease)}')
+            self.chat_display.append(f'Bot: Did you mean you have {" and ".join(matching_symptoms)}. If so, you might have {" or ".join(disease)}')
 
             description = agent.ask_description(disease)
             self.chat_display.append(f'Bot: Details of disease are, {description}')
