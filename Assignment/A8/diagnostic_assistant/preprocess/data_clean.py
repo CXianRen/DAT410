@@ -19,9 +19,10 @@ def remove_trailing_spaces(df):
 
     return pd.DataFrame(s, columns=df.columns)
 
+
 def encode_symptoms(df):
     cols = df.columns
-    df_severity= get_symptom_severity()
+    df_severity = get_symptom_severity()
     df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')
 
     vals = df.values
@@ -34,7 +35,6 @@ def encode_symptoms(df):
 
 
 def pre_process_data(df):
-
     df = remove_hyphen(df)
     df = remove_trailing_spaces(df)
     df = df.fillna(0)

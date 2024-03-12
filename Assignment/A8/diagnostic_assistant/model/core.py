@@ -7,6 +7,7 @@ from diagnostic_assistant.model.model import Model
 from diagnostic_assistant.preprocess.data_clean import pre_process_data
 from diagnostic_assistant.preprocess.load_data import get_dataset, get_symptom_severity, get_symptom_description, \
     get_precautions
+from diagnostic_assistant.utils.utils import get_best_match_symptoms
 
 
 class DiagnosticAgent:
@@ -27,6 +28,13 @@ class DiagnosticAgent:
             model.save()
         self.model = model
 
+    def ask_matching_symptoms(self, symptoms):
+        df_severity = get_symptom_severity()
+        df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')
+        all_symptoms = df_severity['Symptom'].unique()
+        symptoms = [x.replace('_', ' ') for x in symptoms]
+        return get_best_match_symptoms(symptoms, all_symptoms)
+
     def ask_disease(self, symptoms):
         if self.model is None:
             self.train()
@@ -34,7 +42,11 @@ class DiagnosticAgent:
         df_severity = get_symptom_severity()
         df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')
 
+        all_symptoms = df_severity['Symptom'].unique()
+
         symptoms = [x.replace('_',' ') for x in symptoms]
+        symptoms = get_best_match_symptoms(symptoms, all_symptoms)
+
         features = [0] * 17
 
         a = np.array(df_severity["Symptom"])

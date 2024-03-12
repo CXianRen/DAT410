@@ -60,15 +60,19 @@ class ChatBotGUI(QWidget):
         self.chat_display.append(f'You: {user_input}')
 
         diagnosis_start = True # make this when ready to ask from Agent
-        symtoms = ['itching', 'skin_rash']
+        symptoms = user_input.split(",")
+        # symptoms = ['itchi', 'sin_rash'] # this list need to fill with extracted symptoms
         if diagnosis_start:
             agent = DiagnosticAgent()
 
-            disease = agent.ask_disease(symtoms)
-            self.chat_display.append(f'Bot: You might have {" or ".join(disease)}')
+            matching_symptoms = agent.ask_matching_symptoms(symptoms)
+            self.chat_display.append(f'Bot: Did you mean you have {" and ".join(matching_symptoms)}, if so, ')
+
+            disease = agent.ask_disease(symptoms)
+            self.chat_display.append(f'you might have {" or ".join(disease)}')
 
             description = agent.ask_description(disease)
-            self.chat_display.append(f'Bot: Details of disease is, {description}')
+            self.chat_display.append(f'Bot: Details of disease are, {description}')
 
             precautions = agent.ask_precautions(disease)
             self.chat_display.append(f'Bot: You can take precautions like {precautions}')
