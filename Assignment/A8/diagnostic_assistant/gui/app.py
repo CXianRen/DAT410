@@ -1,13 +1,14 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton, QGroupBox, QLabel
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QHBoxLayout,
+    QTextEdit, QLineEdit, QPushButton, QGroupBox
+)
 from PyQt5.QtGui import QFont
+from diagnostic_assistant.base.agent import DiagnosticAgent
 
-from diagnostic_assistant.model.core import DiagnosticAgent
 
-
-class ChatBot():
-
-    def get_response(self, input):
+class ChatBot:
+    def get_response(self, input_text):
         return "Test"
 
 
@@ -16,9 +17,6 @@ class ChatBotGUI(QWidget):
         super().__init__()
         self.setWindowTitle('Diagnostic Assistant')
         self.chatbot = ChatBot()
-        #self.trainer = ChatterBotCorpusTrainer(self.chatbot)
-        #self.trainer.train('chatterbot.corpus.english')  # Train the chatbot on English corpus
-
         self.initUI()
 
     def initUI(self):
@@ -38,8 +36,9 @@ class ChatBotGUI(QWidget):
 
         self.graph_box = QGroupBox('Details')
         self.graph_box.setFont(QFont("Arial", 10))
-        self.graph_label = QLabel('Details will be displayed here')
+        self.graph_label = QTextEdit()
         self.graph_label.setFont(QFont("Arial", 10))
+        self.graph_label.setReadOnly(True)
         self.graph_box_layout = QVBoxLayout()
         self.graph_box_layout.addWidget(self.graph_label)
         self.graph_box.setLayout(self.graph_box_layout)
@@ -59,15 +58,18 @@ class ChatBotGUI(QWidget):
         response = self.chatbot.get_response(user_input)
         self.chat_display.append(f'You: {user_input}')
 
-        diagnosis_start = True # make this when ready to ask from Agent
+        diagnosis_start = True
         symptoms = user_input.split(",")
-        # symptoms = ['itchi', 'sin_rash'] # this list need to fill with extracted symptoms
         if diagnosis_start:
             agent = DiagnosticAgent()
 
             matching_symptoms = agent.ask_matching_symptoms(symptoms)
             disease = agent.ask_disease(symptoms)
-            self.chat_display.append(f'Bot: Did you mean you have {" and ".join(matching_symptoms)}. If so, you might have {" or ".join(disease)}')
+
+            self.chat_display.append(
+                f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
+                f' If so, you might have {" or ".join(disease)}'
+            )
 
             description = agent.ask_description(disease)
             self.chat_display.append(f'Bot: Details of disease are, {description}')
@@ -75,12 +77,15 @@ class ChatBotGUI(QWidget):
             precautions = agent.ask_precautions(disease)
             self.chat_display.append(f'Bot: You can take precautions like {precautions}')
 
+            self.graph_label.append(agent.ask_accuracy())
+
 
 def main():
     app = QApplication(sys.argv)
     window = ChatBotGUI()
     window.show()
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()

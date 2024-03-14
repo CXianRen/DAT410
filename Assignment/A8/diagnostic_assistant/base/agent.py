@@ -23,7 +23,7 @@ class DiagnosticAgent:
         labels = self.processed_data['Disease'].values
         tree = DecisionTreeClassifier(criterion='gini', random_state=42, max_depth=13)
         model = Model('decision_tree_model', tree, features, labels)
-        if not os.path.exists('decision_tree_model.joblib'):
+        if not model.is_trained('decision_tree_model'):
             model.fit()
             model.save()
         self.model = model
@@ -60,6 +60,11 @@ class DiagnosticAgent:
         print(self.disease)
         return self.disease
 
+    def ask_other_symptoms(self, disease):
+        df = self.processed_data
+        row = df.loc[df['Disease'] == disease[0]].drop(columns=['Disease']).values.tolist()
+        return row
+
     def ask_description(self, disease):
         df_desc = get_symptom_description()
         disp = df_desc[df_desc['Disease'] == disease[0]]
@@ -73,3 +78,6 @@ class DiagnosticAgent:
             precuation_list.append(df_precautions.iloc[c, i])
 
         return ",".join(precuation_list)
+
+    def ask_accuracy(self):
+        return self.model.evaluate()

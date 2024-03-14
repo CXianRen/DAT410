@@ -1,8 +1,11 @@
+import os
+
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import joblib
+
 
 class Model:
 
@@ -15,36 +18,47 @@ class Model:
                                                                                 train_size=train_spilt_size,
                                                                                 random_state=42)
         self.predictions = None
+        self.trained_model_path =  os.path.dirname(os.path.abspath(__file__))+"/trained/"
 
     def fit(self):
         self.model.fit(self.x_train, self.y_train)
 
     def save(self):
-        joblib.dump(self.model, self.name+'.joblib')
+        joblib.dump(self.model, self.trained_model_path + self.name + '.joblib')
 
-    def predict(self, input):
-        _model = joblib.load(self.name+'.joblib')
+    def predict(self, input=None):
+        _model = joblib.load(self.trained_model_path + self.name + '.joblib')
         if input:
             self.predictions = _model.predict(input)
         else:
-            self.predictions = _model.predict(self.x_test[0])
+            self.predictions = _model.predict(self.x_test)
 
         return self.predictions
 
     def evaluate(self):
-        accuracy = accuracy_score(self.y_test, self.predictions)
-        precision = precision_score(self.y_test, self.predictions)
-        recall = recall_score(self.y_test, self.predictions)
-        f1 = f1_score(self.y_test, self.predictions)
+        y_pred = self.predict()
+        accuracy = accuracy_score(self.y_test, y_pred)
+        precision = precision_score(self.y_test, y_pred, average='macro')
+        recall = recall_score(self.y_test, y_pred, average='macro')
+        f1 = f1_score(self.y_test, y_pred, average='macro')
+
+        stats = f"""Accuracy: {accuracy}
+Precision: {precision}
+Recall: {recall}
+F1-score: {f1}
+        """
 
         print("Accuracy:", accuracy)
         print("Precision:", precision)
         print("Recall:", recall)
         print("F1-score:", f1)
 
-        cm = confusion_matrix(self.y_test,self. predictions)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm)
-        disp.plot()
-        plt.title('Confusion Matrix')
-        plt.show()
+        #cm = confusion_matrix(self.y_test, y_pred)
+        #disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+        #disp.plot()
+        #plt.title('Confusion Matrix')
+        #plt.show()
+        return stats
 
+    def is_trained(self, name):
+        return os.path.exists(self.trained_model_path + self.name + '.joblib')
