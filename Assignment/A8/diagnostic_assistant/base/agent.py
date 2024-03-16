@@ -1,6 +1,7 @@
 import os
 
 import joblib
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from diagnostic_assistant.model.model import Model
@@ -21,9 +22,12 @@ class DiagnosticAgent:
         self.processed_data = pre_process_data(data)
         features = self.processed_data.iloc[:, 1:].values
         labels = self.processed_data['Disease'].values
-        tree = DecisionTreeClassifier(criterion='gini', random_state=42, max_depth=13)
-        model = Model('decision_tree_model', tree, features, labels)
-        if not model.is_trained('decision_tree_model'):
+
+        #decisionTree = DecisionTreeClassifier(criterion='gini', random_state=42, max_depth=13)
+        randomForest = RandomForestClassifier()
+
+        model = Model('random_forest_model', randomForest, features, labels)
+        if not model.is_trained('random_forest_model'):
             model.fit()
             model.save()
         self.model = model

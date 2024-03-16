@@ -66,6 +66,13 @@ class ChatBotGUI(QWidget):
             matching_symptoms = agent.ask_matching_symptoms(symptoms)
             disease = agent.ask_disease(symptoms)
 
+            if len(matching_symptoms) == 0:
+                self.chat_display.append(
+                    f'Bot: Did you mean you have {" and ".join(symptoms)}.'
+                    f' Sorry we have not found any symptoms like {" and ".join(symptoms)} in the database. '
+                    f'Please provide more details')
+                return
+
             self.chat_display.append(
                 f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
                 f' If so, you might have {" or ".join(disease)}'

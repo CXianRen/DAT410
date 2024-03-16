@@ -30,4 +30,8 @@ There are columns containing diseases, their symptoms , precautions to be taken,
 
 ![alt text](./doc/image_4.png)
 
+# Model
+
+
+
 
