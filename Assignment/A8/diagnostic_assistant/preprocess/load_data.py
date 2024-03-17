@@ -19,3 +19,8 @@ def get_symptom_description():
 def get_precautions():
     df = pd.read_csv('../../data/symptom_precaution.csv')
     return df
+
+
+def get_diabetes_data():
+    df = pd.read_csv('../../data/detail/diabetes.csv')
+    return df

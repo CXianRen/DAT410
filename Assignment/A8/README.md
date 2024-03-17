@@ -30,8 +30,18 @@ There are columns containing diseases, their symptoms , precautions to be taken,
 
 ![alt text](./doc/image_4.png)
 
+# Pre processing
+
+Dataset needed to be preprocessed in order to use in the model. 
+We have use below actions to make dataset usable to build a model. 
+1. Remove trailing spaces and underscore from the symptom list
+2. Encode symptoms with the severity as a number
+3. Assign not available severity with a default value. 
+4. Fill NA values with zeros
+
+
 # Model
 
-
+For modeling we have evaluated Decision Tress and Random Forest models.
 
 

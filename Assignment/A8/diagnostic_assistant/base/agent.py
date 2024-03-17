@@ -5,16 +5,19 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 from diagnostic_assistant.model.model import Model
-from diagnostic_assistant.preprocess.data_clean import pre_process_data
+from diagnostic_assistant.preprocess.data_clean import pre_process_data, pre_process_diabetes_data
 from diagnostic_assistant.preprocess.load_data import get_dataset, get_symptom_severity, get_symptom_description, \
-    get_precautions
+    get_precautions, get_diabetes_data
 from diagnostic_assistant.utils.utils import get_best_match_symptoms
-
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import  MaxAbsScaler
+from sklearn.ensemble import ExtraTreesClassifier
 
 class DiagnosticAgent:
 
     def __init__(self):
         self.model = None
+        self.detail_model = None
         self.processed_data = None
 
     def train(self):
@@ -28,6 +31,23 @@ class DiagnosticAgent:
 
         model = Model('random_forest_model', randomForest, features, labels)
         if not model.is_trained('random_forest_model'):
+            model.fit()
+            model.save()
+        self.model = model
+
+    def train_detail(self):
+        diabetes_data = get_diabetes_data()
+        diabetes_data = pre_process_diabetes_data(diabetes_data)
+        features = diabetes_data.drop(columns=['outcome'])
+        labels = diabetes_data['outcome']
+
+        model_pipeline = Pipeline([
+            ('scaler', MaxAbsScaler()),
+            ('classifier', ExtraTreesClassifier(verbose=0))
+        ])
+
+        model = Model('extra_tree_classifier', model_pipeline, features, labels)
+        if not model.is_trained('extra_tree_classifier'):
             model.fit()
             model.save()
         self.model = model
@@ -85,3 +105,9 @@ class DiagnosticAgent:
 
     def ask_accuracy(self):
         return self.model.evaluate()
+
+    def ask_detail_disease(self, parameters):
+        if self.detail_model is None:
+            self.train_detail()
+
+        return self.model.predict(input=[parameters])

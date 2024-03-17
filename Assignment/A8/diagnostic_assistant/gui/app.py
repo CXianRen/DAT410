@@ -73,6 +73,20 @@ class ChatBotGUI(QWidget):
                     f'Please provide more details')
                 return
 
+            detail_diseases = ['Diabetes', 'Heart attack']
+            if disease in detail_diseases:
+                self.chat_display.append(f'Bot: We might think that you are having {disease}. But, I would like to ask more question from you to confirm it. ?')
+                parameters = None
+                if disease == 'Diabetes':
+                    question_lst = ['What is your Age.?', 'How many pregnancies you had.?', 'What is the Glucose value in the report.?', 'What is the BloodPressure.?', 'What is the SkinThickness parameter in the report.?',
+                                    'What is the Insulin level.?',	'What is BMI valule.?',	'What is DiabetesPedigreeFunction value in the report.?']
+                    parameters = [0] * 8
+                    for idx,q in enumerate(question_lst):
+                        self.chat_display.append('Bot: {q}')
+                        resp = self.chatbot.get_response(q)
+                        parameters[idx] = resp
+                    agent.ask_detail_disease(parameters)
+
             self.chat_display.append(
                 f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
                 f' If so, you might have {" or ".join(disease)}'

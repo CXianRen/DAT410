@@ -49,3 +49,9 @@ def pre_process_data(df):
     print(df.head())
 
     return df
+
+
+def pre_process_diabetes_data(df):
+    df = df.fillna(0)
+    return df
+
