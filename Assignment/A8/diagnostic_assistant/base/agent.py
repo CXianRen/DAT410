@@ -38,19 +38,19 @@ class DiagnosticAgent:
     def train_detail(self):
         diabetes_data = get_diabetes_data()
         diabetes_data = pre_process_diabetes_data(diabetes_data)
-        features = diabetes_data.drop(columns=['outcome'])
-        labels = diabetes_data['outcome']
+        features = diabetes_data.drop(columns=['Outcome'])
+        labels = diabetes_data['Outcome']
 
         model_pipeline = Pipeline([
             ('scaler', MaxAbsScaler()),
             ('classifier', ExtraTreesClassifier(verbose=0))
         ])
 
-        model = Model('extra_tree_classifier', model_pipeline, features, labels)
-        if not model.is_trained('extra_tree_classifier'):
-            model.fit()
-            model.save()
-        self.model = model
+        detail_model = Model('extra_tree_classifier', model_pipeline, features, labels)
+        if not detail_model.is_trained('extra_tree_classifier'):
+            detail_model.fit()
+            detail_model.save()
+        self.detail_model = detail_model
 
     def ask_matching_symptoms(self, symptoms):
         df_severity = get_symptom_severity()
@@ -96,18 +96,23 @@ class DiagnosticAgent:
 
     def ask_precautions(self, disease):
         df_precautions = get_precautions()
-        c = np.where(df_precautions['Disease'] == disease[0])[0][0]
         precuation_list = []
-        for i in range(1, len(df_precautions.iloc[c])):
-            precuation_list.append(df_precautions.iloc[c, i])
+        try:
+            c = np.where(df_precautions['Disease'] == disease[0])[0][0]
+            for i in range(1, len(df_precautions.iloc[c])):
+                precuation_list.append(df_precautions.iloc[c, i])
+        except:
+            pass
 
         return ",".join(precuation_list)
 
     def ask_accuracy(self):
         return self.model.evaluate()
 
-    def ask_detail_disease(self, parameters):
+    def ask_disease_confirmation(self, parameters):
         if self.detail_model is None:
             self.train_detail()
 
-        return self.model.predict(input=[parameters])
+        disease_confirmed = self.detail_model.predict(input=[parameters])[0]== 1
+
+        return disease_confirmed

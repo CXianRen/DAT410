@@ -55,7 +55,6 @@ class ChatBotGUI(QWidget):
         user_input = self.input_field.text()
         self.input_field.clear()
 
-        response = self.chatbot.get_response(user_input)
         self.chat_display.append(f'You: {user_input}')
 
         diagnosis_start = True
@@ -65,6 +64,8 @@ class ChatBotGUI(QWidget):
 
             matching_symptoms = agent.ask_matching_symptoms(symptoms)
             disease = agent.ask_disease(symptoms)
+
+            # diabetes symptoms = fatigue, weight_loss, restlessness, lethargy, irregular_sugar_level, blurred_and_distorted_vision, obesity, excessive_hunger, increased_appetite, polyuria
 
             if len(matching_symptoms) == 0:
                 self.chat_display.append(
@@ -80,17 +81,33 @@ class ChatBotGUI(QWidget):
                 if disease == 'Diabetes':
                     question_lst = ['What is your Age.?', 'How many pregnancies you had.?', 'What is the Glucose value in the report.?', 'What is the BloodPressure.?', 'What is the SkinThickness parameter in the report.?',
                                     'What is the Insulin level.?',	'What is BMI valule.?',	'What is DiabetesPedigreeFunction value in the report.?']
-                    parameters = [0] * 8
-                    for idx,q in enumerate(question_lst):
-                        self.chat_display.append('Bot: {q}')
-                        resp = self.chatbot.get_response(q)
-                        parameters[idx] = resp
-                    agent.ask_detail_disease(parameters)
 
-            self.chat_display.append(
-                f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
-                f' If so, you might have {" or ".join(disease)}'
-            )
+                    # parameters = [0] * 8
+
+                    diabetes_patient_params = [50, 6, 148, 72, 35, 0, 33.6, 0.627]
+                    parameters = diabetes_patient_params  # Test data
+                    for idx,q in enumerate(question_lst):
+                        self.chat_display.append(f'Bot: {q}')
+
+                        # TODO get input from user
+                        #resp = self.input_field.text()
+                        self.chat_display.append(f'You: {parameters[idx]}')
+                        #parameters[idx] = resp
+
+
+                    confirmed = agent.ask_disease_confirmation(parameters)
+
+            if confirmed:
+                self.chat_display.append(
+                    f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
+                    f' If so, it is highly probable that you have {" or ".join(disease)}'
+                )
+            else:
+                self.chat_display.append(
+                    f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
+                    f' If so, you might have {" or ".join(disease)}'
+                )
+
 
             description = agent.ask_description(disease)
             self.chat_display.append(f'Bot: Details of disease are, {description}')
