@@ -5,18 +5,14 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 from diagnostic_assistant.base.agent import DiagnosticAgent
-
-
-class ChatBot:
-    def get_response(self, input_text):
-        return "Test"
+from diagnostic_assistant.bot.chatbot import mDoctorBot
 
 
 class ChatBotGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Diagnostic Assistant')
-        self.chatbot = ChatBot()
+        self.chatbot = mDoctorBot()
         self.initUI()
 
     def initUI(self):
@@ -63,51 +59,9 @@ class ChatBotGUI(QWidget):
             agent = DiagnosticAgent()
 
             matching_symptoms = agent.ask_matching_symptoms(symptoms)
+            print("[DEBUG] matching_symptoms:", matching_symptoms) 
             disease = agent.ask_disease(symptoms)
-
-            # diabetes symptoms = fatigue, weight_loss, restlessness, lethargy, irregular_sugar_level, blurred_and_distorted_vision, obesity, excessive_hunger, increased_appetite, polyuria
-
-            if len(matching_symptoms) == 0:
-                self.chat_display.append(
-                    f'Bot: Did you mean you have {" and ".join(symptoms)}.'
-                    f' Sorry we have not found any symptoms like {" and ".join(symptoms)} in the database. '
-                    f'Please provide more details')
-                return
-
-            detail_diseases = ['Diabetes', 'Heart attack']
-            if disease in detail_diseases:
-                self.chat_display.append(f'Bot: We might think that you are having {disease}. But, I would like to ask more question from you to confirm it. ?')
-                parameters = None
-                if disease == 'Diabetes':
-                    question_lst = ['What is your Age.?', 'How many pregnancies you had.?', 'What is the Glucose value in the report.?', 'What is the BloodPressure.?', 'What is the SkinThickness parameter in the report.?',
-                                    'What is the Insulin level.?',	'What is BMI valule.?',	'What is DiabetesPedigreeFunction value in the report.?']
-
-                    # parameters = [0] * 8
-
-                    diabetes_patient_params = [50, 6, 148, 72, 35, 0, 33.6, 0.627]
-                    parameters = diabetes_patient_params  # Test data
-                    for idx,q in enumerate(question_lst):
-                        self.chat_display.append(f'Bot: {q}')
-
-                        # TODO get input from user
-                        #resp = self.input_field.text()
-                        self.chat_display.append(f'You: {parameters[idx]}')
-                        #parameters[idx] = resp
-
-
-                    confirmed = agent.ask_disease_confirmation(parameters)
-
-            if confirmed:
-                self.chat_display.append(
-                    f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
-                    f' If so, it is highly probable that you have {" or ".join(disease)}'
-                )
-            else:
-                self.chat_display.append(
-                    f'Bot: Did you mean you have {" and ".join(matching_symptoms)}.'
-                    f' If so, you might have {" or ".join(disease)}'
-                )
-
+            print("[DEBUG] disease:", disease)
 
             description = agent.ask_description(disease)
             self.chat_display.append(f'Bot: Details of disease are, {description}')
