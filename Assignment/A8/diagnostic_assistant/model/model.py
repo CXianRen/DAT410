@@ -5,10 +5,10 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from sklearn.metrics import ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import joblib
+import numpy as np
 
 
 class Model:
-
     def __init__(self, name, model, data, labels, train_spilt_size=0.8):
         self.name = name
         self.model = model
@@ -26,7 +26,7 @@ class Model:
     def save(self):
         joblib.dump(self.model, self.trained_model_path + self.name + '.joblib')
 
-    def predict(self, input=None):
+    def predict(self, input):
         _model = joblib.load(self.trained_model_path + self.name + '.joblib')
         if input:
             self.predictions = _model.predict(input)
@@ -35,6 +35,18 @@ class Model:
 
         return self.predictions
 
+    def predict_proba(self, input):
+        _model = joblib.load(self.trained_model_path + self.name + '.joblib')
+        self.predictions = _model.predict_proba(input)
+        top3_indices = self.predictions.argsort(axis=1)[:, -3:] 
+        top3_probabilities = np.take_along_axis(self.predictions, top3_indices, axis=1)
+        
+        print("DEBUG: top3_indices:", top3_indices)
+        print("DEBUG: top3_probabilities:", top3_probabilities)
+        print("DEBUG: labels:", self.labels[top3_indices])
+       
+        return self.predictions
+    
     def evaluate(self):
         y_pred = self.predict()
         accuracy = accuracy_score(self.y_test, y_pred)

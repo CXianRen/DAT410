@@ -29,15 +29,16 @@ Test = True
 
 if Test:
   # import the mock functions
-  import sys
-  sys.path.append('.')
-  from model.ai_mock import \
+  from diagnostic_assistant.model.ai_mock import \
     get_possible_disease_with_symptoms, \
     get_possible_symptoms_of_disease, \
     get_symptoms_from_text, \
     get_duration_from_text, \
     get_symptoms_severity_duration_from_text, \
     get_yes_or_not
+
+else:
+    from diagnostic_assistant.base.agent import DiagnosticAgent
 
 import os
 import json
@@ -47,7 +48,7 @@ class mDoctorBot():
     def __init__(self, pattern_path = \
             os.path.join(os.path.dirname(
                 os.path.abspath(__file__)),
-                "patterns.json")):
+                "patterns.json"), agent=None):
         self.symptoms = []
         self.symptoms_severity = []
         self.symptoms_duration = []
@@ -60,6 +61,8 @@ class mDoctorBot():
     
         with open(pattern_path, "r") as f:
             self.pattern_list = json.load(f)
+
+        self.agent = agent
 
     def __mprint(self, msg):
       self.history_text.append(msg)
@@ -76,12 +79,16 @@ class mDoctorBot():
         self.state = 1
         input_text = self.input_text
         self.history_text.append(input_text)
-        self.symptoms, self.symptoms_severity, self.symptoms_duration = \
-          get_symptoms_severity_duration_from_text(self.history_text, input_text)
+        # self.symptoms, self.symptoms_severity, self.symptoms_duration = \
+        #   get_symptoms_severity_duration_from_text(self.history_text, input_text)
+        
+        self.symptoms = self.agent.ask_matching_symptoms(self.symptoms)
         if self.symptoms == []:
             self.next_state = 2
             return
         
+        # hack, todo if we need 
+        self.symptoms_duration = [1]
         if self.symptoms_duration == []:
             self.__mprint(random.choice(self.pattern_list["state_1_1"]))
             self.next_state = 3
@@ -99,7 +106,9 @@ class mDoctorBot():
         self.state = 3
         input_text = self.input_text
         self.history_text.append(input_text)
-        self.symptoms_duration = get_duration_from_text(input_text)
+        # hack, todo if we need 
+        # self.symptoms_duration = get_duration_from_text(input_text)
+        self.symptoms_duration = [0]
         print("\t\t\t\t[DEBUG] self.symptoms_duration: ", self.symptoms_duration)
         if self.symptoms_duration == []:
             self.next_state = 4

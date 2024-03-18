@@ -80,9 +80,9 @@ class DiagnosticAgent:
                 if symptoms[j] == a[k]:
                     features[j] = b[k]
 
-        self.disease = self.model.predict(input=[features])
-        print(self.disease)
-        return self.disease
+        self.diseases = self.model.predict_proba(input=[features])
+        print("[DEBUG] self.diseases:", self.diseases)
+        return self.diseases
 
     def ask_other_symptoms(self, disease):
         df = self.processed_data
