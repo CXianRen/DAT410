@@ -90,7 +90,7 @@ class mDoctorBot():
         # self.symptoms, self.symptoms_severity, self.symptoms_duration = \
         #   get_symptoms_severity_duration_from_text(self.history_text, input_text)
         self.symptoms = self.extractor.extract_symptoms(input_text)
-
+        print("\t\t\t\t[DEBUG] extractor symptoms: ", self.symptoms)
         self.symptoms = self.agent.ask_matching_symptoms(self.symptoms)
         print("\t\t\t\t[DEBUG] matching symptoms: ", self.symptoms)
         if self.symptoms == []:
@@ -235,11 +235,34 @@ class mDoctorBot():
 
     def state_9(self):
         self.state = 9
-        
+        input_text = self.input_text
+        # check the possible response:
+        rq_map={
+            "thanks": ["You're welcome.", "I'm here to help.", "No problem."],
+            "thank you": ["You're welcome.", "I'm here to help.", "No problem."],
+            "goodbye": ["Take care. Goodbye.", "Goodbye.", "See you later."],   
+            "bye": ["Take care. Goodbye.", "Goodbye.", "See you later."],
+            "see you": ["Take care. Goodbye.", "Goodbye.", "See you later."]
+        }
+        for k in rq_map.keys():
+            if input_text.lower() == k:
+                self.__mprint(random.choice(rq_map[k]))
+                self.next_state = None
+                return
+
+        self.__mprint("ake care. Goodbye.")
         self.next_state = None
 
     def conclusion(self):
-        self.__mprint("%s %s, %s" % ((random.choice(self.pattern_list["conclusion"]), self.possible_disease[-3:], self.topNprob[-3:])))
+        msg = random.choice(self.pattern_list["conclusion"])
+        msg +="\n \tThe hiehst possible disease is %s with a probability of %s" % (self.possible_disease[-1], self.topNprob[-1])
+        msg +="\n \tThe second possible disease is %s with a probability of %s" % (self.possible_disease[-2], self.topNprob[-2])
+        msg +="\n \tThe third possible disease is %s with a probability of %s" % (self.possible_disease[-3], self.topNprob[-3])
+        msg +="\n Here are some tips for you:"
+        msg +="\n \tFor the first possible disease %s, %s" % (self.possible_disease[-1], self.agent.ask_description(self.possible_disease[-1]))
+        msg +="\n \tFor the second possible disease %s, %s" % (self.possible_disease[-2], self.agent.ask_description(self.possible_disease[-2]))
+        msg +="\n \tFor the third possible disease %s, %s" % (self.possible_disease[-3], self.agent.ask_description(self.possible_disease[-3]))
+        self.__mprint(msg)
         
     # def run(self):
     #     while(self.next_state!=None):

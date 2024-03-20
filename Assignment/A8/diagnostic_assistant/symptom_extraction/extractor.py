@@ -2,23 +2,25 @@
 
 from diagnostic_assistant.utils.utils import symptom_to_label
 
-
+import editdistance
+import re
 class SymptomExtractor:
     def __init__(self):
+        self.symptom_keywords = set(symptom_to_label.keys())
         #self.nlp = spacy.load("en_core_web_sm")
-        self.symptom_keywords = set(["headache", "fever", "cough", "fatigue", "nausea", "muscle ache", "chills"])
-
+        
     def extract_symptoms(self, user_input):
-        #doc = self.nlp(user_input)
+        print(user_input)
         extracted_symptoms = []
-        symptom_to_label_keys = symptom_to_label.keys()
-        for word in user_input.split():
+        for word in re.split(r'[,:| ]', user_input ):
             # remove the characters that are not alphabets
             word = ''.join(e for e in word if e.isalnum())
-            if word in self.symptom_keywords:
-                extracted_symptoms.append(word)
-            elif word in symptom_to_label_keys:
-                extracted_symptoms.append(word)
+            for symptom in self.symptom_keywords:
+                dist = editdistance.eval(word.lower(), symptom.lower())
+                max_len = max(len(word), len(symptom))
+                similarity = 1 - dist/max_len
+                if similarity > 0.6:
+                    extracted_symptoms.append(symptom) 
         return extracted_symptoms
 
 

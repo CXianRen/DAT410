@@ -1,0 +1,6 @@
+disease          ,syptoms number ,topN result                                            ,topN prob
+Fungal infection ,             1 ,['Drug Reaction' 'Osteoarthristis' 'Fungal infection'] ,[0.12510835 0.38583595 0.38733182]
+Fungal infection ,             2 ,['Drug Reaction' 'Osteoarthristis' 'Fungal infection'] ,[7.24539738e-05 2.15854883e-04 9.99485422e-01]
+Dengue           ,             1 ,not in top 10 result                                   ,[]                                               ,
+Dengue           ,             2 ,['Dengue' 'Malaria' 'Typhoid' 'Allergy' 'Pneumonia'    ,[0.0132637  0.0149441  0.01906879 0.51544243]
+Dengue           ,             3 ,['Malaria' 'Dengue' 'Typhoid']                         ,[3.04268020e-02 8.14989900e-02 5.27002876e-01]
