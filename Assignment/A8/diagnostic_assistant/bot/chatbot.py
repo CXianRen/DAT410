@@ -25,7 +25,7 @@
 # greeting
 (11) Doctor: You're welcome. I'll have my nurse set up the tests for you. We'll go from there.
 """
-Test = True
+Test = False
 
 if Test:
   # import the mock functions
@@ -36,13 +36,19 @@ if Test:
     get_duration_from_text, \
     get_symptoms_severity_duration_from_text, \
     get_yes_or_not
-
 else:
     from diagnostic_assistant.base.agent import DiagnosticAgent
 
 import os
 import json
 import random
+
+from diagnostic_assistant.utils.utils import symptom_to_label, \
+    label_to_symptom, disease_to_label, label_to_disease,\
+    convert_dis_to_onehot, convert_to_onehot, convert_to_symptoms, convert_to_disease
+
+from diagnostic_assistant.symptom_extraction.extractor import SymptomExtractor, DurationExtractor, get_yes_or_not
+
 
 class mDoctorBot():
     def __init__(self, pattern_path = \
@@ -63,9 +69,11 @@ class mDoctorBot():
             self.pattern_list = json.load(f)
 
         self.agent = agent
+        self.extractor = SymptomExtractor()
+        self.dextractor = DurationExtractor()
 
     def __mprint(self, msg):
-      self.history_text.append(msg)
+      self.history_text.append(msg) 
       self.output_text = msg
       
     def state_0(self):
@@ -81,14 +89,16 @@ class mDoctorBot():
         self.history_text.append(input_text)
         # self.symptoms, self.symptoms_severity, self.symptoms_duration = \
         #   get_symptoms_severity_duration_from_text(self.history_text, input_text)
-        
+        self.symptoms = self.extractor.extract_symptoms(input_text)
+
         self.symptoms = self.agent.ask_matching_symptoms(self.symptoms)
+        print("\t\t\t\t[DEBUG] matching symptoms: ", self.symptoms)
         if self.symptoms == []:
             self.next_state = 2
             return
         
         # hack, todo if we need 
-        self.symptoms_duration = [1]
+        self.symptoms_duration = self.dextractor.extract_duration(input_text)
         if self.symptoms_duration == []:
             self.__mprint(random.choice(self.pattern_list["state_1_1"]))
             self.next_state = 3
@@ -107,13 +117,11 @@ class mDoctorBot():
         input_text = self.input_text
         self.history_text.append(input_text)
         # hack, todo if we need 
-        # self.symptoms_duration = get_duration_from_text(input_text)
-        self.symptoms_duration = [0]
+        self.symptoms_duration = self.dextractor.extract_duration(input_text)
         print("\t\t\t\t[DEBUG] self.symptoms_duration: ", self.symptoms_duration)
         if self.symptoms_duration == []:
             self.next_state = 4
             return
-        
         self.next_state = 5
         
     def state_4(self):
@@ -125,28 +133,51 @@ class mDoctorBot():
         # get possible disease and check if need to ask more
         self.state = 5
         
-        self.possible_disease = get_possible_disease_with_symptoms(self.symptoms)
-        print("\t\t\t\t[DEBUG] self.possible_disease: ", self.possible_disease)
-        if self.possible_disease == []:
-            self.__mprint("Doctor: "+ random.choice(self.pattern_list["state_5_1"]))
-            self.next_state = 6
-            return
+        # self.possible_disease = get_possible_disease_with_symptoms(self.symptoms)
+        topN, self.topNprob = self.agent.ask_disease(self.symptoms)
         
+        self.possible_disease = [label_to_disease[i+1] for i in topN]
+        print("\t\t\t\t[DEBUG] self.possible_disease: ", [label_to_disease[i+1] for i in topN])
+        print("\t\t\t\t[DEBUG] self.topNprob: ", self.topNprob)
+        if len(topN) == 0:
+            self.__mprint(random.choice(self.pattern_list["state_5_1"]))
+            self.next_state = 6  
+            return
+
         # check the possible disease:
         # if there are more than one possible disease
-        if self.possible_disease[0][1] < 0.5:
-            self.__mprint("Doctor: " + random.choice(self.pattern_list["state_5_2"]))
-            self.next_state = 8
-            return
+        if self.topNprob[-1] < 0.5:
+            msg = random.choice(self.pattern_list["state_5_2"])
+            
+            symptoms_of_disease = self.agent.ask_other_symptoms(self.possible_disease[-1])
+            self.symptom_to_ask = None
+            for s in symptoms_of_disease:
+                if s not in self.symptoms and s not in self.rejected_symptoms:
+                    self.symptom_to_ask = s
+                    break
+                    
+            print("\t\t\t\t[DEBUG] symptoms_of_disease: ", symptoms_of_disease)
+            print("\t\t\t\t[DEBUG] self.symptoms: ", self.symptoms)
+            print("\t\t\t\t[DEBUG] self.rejected_symptoms: ", self.rejected_symptoms)
+            print("\t\t\t\t[DEBUG] symptom_to_ask: ", self.symptom_to_ask)
+                
+            if self.symptom_to_ask is not None:
+            # ask more question to improve the score  if possible
+                msg += "\n%s %s" %(random.choice(self.pattern_list["state_8_1"]), self.symptom_to_ask)
+                self.__mprint(msg)        
+                self.next_state = 8
+                return
         
-        self.next_state = None
+        print("\t\t\t\t[DEBUG] no need to ask more")
+        self.conclusion()
+        self.next_state = 9
         # check 
 
     def state_6(self):
         self.state = 6
         input_text = self.input_text
         self.history_text.append(input_text)
-        new_symptoms = get_symptoms_from_text(input_text)
+        new_symptoms = self.extractor.extract_symptoms(input_text)
         if new_symptoms == []:
             self.next_state = 7
             return
@@ -157,49 +188,62 @@ class mDoctorBot():
         self.state = 7
         self.__mprint(random.choice(self.pattern_list["state_7_1"]))
         self.next_state = 6
-
+        
     def state_8(self):
         self.state = 8 
-        if len(self.symptoms) + len(self.rejected_symptoms)> 5:
+        input_text = self.input_text
+        self.history_text.append(input_text)
+        if get_yes_or_not(input_text) is None :
+            self.__mprint("Sorry, I don't understand. Can you please answer with a yes or no?")
+            self.next_state = 8
+            return
+        if get_yes_or_not(input_text) == False:
+            self.rejected_symptoms.append(self.symptom_to_ask)
+        else:
+            self.symptoms.append(self.symptom_to_ask)
+                
+        if len(self.rejected_symptoms)> 15:
             # get the conclusion
-          self.next_state = None
-
-        symptoms_of_disease = get_possible_symptoms_of_disease(self.possible_disease[0][0])
-        symptom_to_ask = None
+            self.conclusion()
+            self.next_state = 9
+        # ask more question to improve the score  if possible
+        topN, self.topNprob = self.agent.ask_disease(self.symptoms)
+        
+        self.possible_disease = [label_to_disease[i+1] for i in topN]
+        print("\t\t\t\t[DEBUG] self.possible_disease: ", [label_to_disease[i+1] for i in topN])
+        print("\t\t\t\t[DEBUG] self.topNprob: ", self.topNprob)
+        
+        symptoms_of_disease = self.agent.ask_other_symptoms(self.possible_disease[-1])
+        self.symptom_to_ask = None
         for s in symptoms_of_disease:
             if s not in self.symptoms and s not in self.rejected_symptoms:
-                symptom_to_ask = s
+                self.symptom_to_ask = s
                 break
         
         print("\t\t\t\t[DEBUG] symptoms_of_disease: ", symptoms_of_disease)
         print("\t\t\t\t[DEBUG] self.symptoms: ", self.symptoms)
         print("\t\t\t\t[DEBUG] self.rejected_symptoms: ", self.rejected_symptoms)
-        print("\t\t\t\t[DEBUG] symptom_to_ask: ", symptom_to_ask)
+        print("\t\t\t\t[DEBUG] symptom_to_ask: ", self.symptom_to_ask)
       
-        if self.possible_disease[0][1]<0.5 and symptom_to_ask is not None:
+        if self.symptom_to_ask is not None:
         # ask more question to improve the score  if possible
-            self.__mprint("%s %s" %(random.choice(self.pattern_list["state_8_1"]), symptom_to_ask))
-            while True:
-                input_text = self.input_text
-                self.history_text.append(input_text)
-                if get_yes_or_not(input_text):
-                    self.symptoms.append(symptom_to_ask)
-                    break
-                else:
-                    self.rejected_symptoms.append(symptom_to_ask)
-                    break
-            # check again  
+            self.__mprint("%s %s" %(random.choice(self.pattern_list["state_8_1"]), self.symptom_to_ask)) 
             self.next_state = 8
             return
+        self.conclusion()
         self.next_state = 9
 
     def state_9(self):
         self.state = 9
-        self.__mprint("%s %s" % ((random.choice(self.pattern_list["conclusion"]), self.possible_disease)))
+        
         self.next_state = None
 
+    def conclusion(self):
+        self.__mprint("%s %s, %s" % ((random.choice(self.pattern_list["conclusion"]), self.possible_disease[-3:], self.topNprob[-3:])))
+        
     # def run(self):
     #     while(self.next_state!=None):
+    #       print("\t\t\t\t[DEBUG] self.next_state: ", self.next_state)
     #       eval("self.state_"+str(self.next_state) + "()")
 
     def get_response(self, input):
@@ -207,12 +251,13 @@ class mDoctorBot():
         self.output_text = None
         self.input_text = input
         while self.output_text is None and self.next_state is not None:
+            print("\t\t\t\t[DEBUG] self.next_state: ", self.next_state)
             eval("self.state_"+str(self.next_state) + "()")
         return self.output_text
 
 
 if __name__ == "__main__":
-    bot = mDoctorBot()
+    bot = mDoctorBot(agent=DiagnosticAgent())
     # trigger the state_0
     print("Doctor: ", bot.get_response(""))
     while True:

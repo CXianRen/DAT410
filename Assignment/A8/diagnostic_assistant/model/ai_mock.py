@@ -33,8 +33,8 @@ def get_symptoms_severity_duration_from_text(history_text, new_text):
     return symptoms, severity, duration
 
 def get_yes_or_not(text):
-    if "yes" in text:
-        return True
-    if "no" in text:
-        return False
-    return None
+    postive_response = ["yes", "sure", "ok", "yeah", "yup", "yep"]
+    for p in postive_response:
+        if p in text:
+            return True
+    return False

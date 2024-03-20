@@ -2,6 +2,7 @@
 
 This is a Python GUI application for extracting symptoms from user queries and predict possible dicease
 
+# pelase use  >= python3.10
 
 # how to run
 + vscode, export the pythonpath before you run

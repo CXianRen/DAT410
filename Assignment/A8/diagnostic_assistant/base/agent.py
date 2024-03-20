@@ -1,72 +1,57 @@
 import os
 
-import joblib
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
 import numpy as np
-from diagnostic_assistant.model.model import Model
-from diagnostic_assistant.preprocess.data_clean import pre_process_data, pre_process_diabetes_data
-from diagnostic_assistant.preprocess.load_data import get_dataset, get_symptom_severity, get_symptom_description, \
-    get_precautions, get_diabetes_data
-from diagnostic_assistant.utils.utils import get_best_match_symptoms
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import  MaxAbsScaler
-from sklearn.ensemble import ExtraTreesClassifier
-
+from diagnostic_assistant.model.FCModel import FCModel
+from diagnostic_assistant.preprocess.load_data import get_symptom_severity, get_symptom_description, \
+    get_precautions, get_dataset
+from diagnostic_assistant.utils.utils import symptom_to_label, \
+    label_to_symptom, disease_to_label, label_to_disease,\
+    convert_dis_to_onehot, convert_to_onehot, convert_to_symptoms, convert_to_disease, \
+    get_best_match_symptoms
+    
 class DiagnosticAgent:
 
     def __init__(self):
-        self.model = None
+        self.model = FCModel()
         self.detail_model = None
         self.processed_data = None
 
     def ask_matching_symptoms(self, symptoms):
-        df_severity = get_symptom_severity()
-        df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')
-        all_symptoms = df_severity['Symptom'].unique()
-        symptoms = [x.replace('_', ' ') for x in symptoms]
+        all_symptoms = symptom_to_label.keys()
         return get_best_match_symptoms(symptoms, all_symptoms)
 
     def ask_disease(self, symptoms):
-        if self.model is None:
-            self.train()
-
-        df_severity = get_symptom_severity()
-        df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')
-
-        all_symptoms = df_severity['Symptom'].unique()
-
-        symptoms = [x.replace('_',' ') for x in symptoms]
+        all_symptoms = symptom_to_label.keys()
         symptoms = get_best_match_symptoms(symptoms, all_symptoms)
+        
+        x = [symptom_to_label[symptom] for symptom in symptoms]
+        x = convert_to_onehot(x)
 
-        features = [0] * 17
-
-        a = np.array(df_severity["Symptom"])
-        b = np.array(df_severity["weight"])
-        for j in range(len(symptoms)):
-            for k in range(len(a)):
-                if symptoms[j] == a[k]:
-                    features[j] = b[k]
-
-        self.diseases = self.model.predict_proba(input=[features])
-        print("[DEBUG] self.diseases:", self.diseases)
-        return self.diseases
+        return self.model.predict_topN(x)
 
     def ask_other_symptoms(self, disease):
-        df = self.processed_data
-        row = df.loc[df['Disease'] == disease[0]].drop(columns=['Disease']).values.tolist()
-        return row
+        df = get_dataset()
+        df = df[df['Disease'] == disease]
+        symptom_set = []
+        for idx, row in df.iterrows():
+            for i in range(1, len(row)):
+                if type(row[i]) is float:
+                    continue
+                else:
+                    if row[i] not in symptom_set:
+                        symptom_set.append(row[i])                    
+        return symptom_set
 
     def ask_description(self, disease):
         df_desc = get_symptom_description()
-        disp = df_desc[df_desc['Disease'] == disease[0]]
+        disp = df_desc[df_desc['Disease'] == disease]
         return disp.values[0][1]
 
     def ask_precautions(self, disease):
         df_precautions = get_precautions()
         precuation_list = []
         try:
-            c = np.where(df_precautions['Disease'] == disease[0])[0][0]
+            c = np.where(df_precautions['Disease'] == disease)[0][0]
             for i in range(1, len(df_precautions.iloc[c])):
                 precuation_list.append(df_precautions.iloc[c, i])
         except:

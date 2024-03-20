@@ -12,7 +12,7 @@ class ChatBotGUI(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Diagnostic Assistant')
-        self.chatbot = mDoctorBot()
+        self.chatbot = mDoctorBot(agent=DiagnosticAgent())
         self.initUI()
 
     def initUI(self):
@@ -50,27 +50,10 @@ class ChatBotGUI(QWidget):
     def send_message(self):
         user_input = self.input_field.text()
         self.input_field.clear()
-
+        
         self.chat_display.append(f'You: {user_input}')
-
-        diagnosis_start = True
-        symptoms = user_input.split(",")
-        if diagnosis_start:
-            agent = DiagnosticAgent()
-
-            matching_symptoms = agent.ask_matching_symptoms(symptoms)
-            print("[DEBUG] matching_symptoms:", matching_symptoms) 
-            disease = agent.ask_disease(symptoms)
-            print("[DEBUG] disease:", disease)
-
-            description = agent.ask_description(disease)
-            self.chat_display.append(f'Bot: Details of disease are, {description}')
-
-            precautions = agent.ask_precautions(disease)
-            self.chat_display.append(f'Bot: You can take precautions like {precautions}')
-
-            self.graph_label.append(agent.ask_accuracy())
-
+        response = self.chatbot.get_response(user_input)
+        self.chat_display.append(f'Bot: {response}')
 
 def main():
     app = QApplication(sys.argv)
