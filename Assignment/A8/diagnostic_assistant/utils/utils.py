@@ -29,6 +29,7 @@ def map_init():
     diseases = df_disease.iloc[:, 0].values
     # cluster the diseases
     diseases = list(set(diseases))
+    diseases.sort()
     # convert the diseases to labels, and the labels to diseases
     disease_to_label = {disease.strip(): i+1 for i, disease in enumerate(diseases)}
     label_to_disease = {i+1: disease.strip() for i, disease in enumerate(diseases)}
@@ -36,7 +37,7 @@ def map_init():
 
 symptom_to_label, label_to_symptom, disease_to_label, label_to_disease = map_init()
 
-def conver_to_onhot(symptoms):
+def convert_to_onehot(symptoms):
     onhot_symptoms = np.zeros(len(symptom_to_label))
     for symptom in symptoms:
         if symptom == 0:
@@ -45,7 +46,7 @@ def conver_to_onhot(symptoms):
         # print(symptom)
     return onhot_symptoms
 
-def conver_dis_to_onhot(disease):
+def convert_dis_to_onehot(disease):
     onhot_disease = np.zeros(len(disease_to_label))
     onhot_disease[disease-1] = 1
     return onhot_disease
