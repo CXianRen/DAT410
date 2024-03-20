@@ -20,38 +20,6 @@ class DiagnosticAgent:
         self.detail_model = None
         self.processed_data = None
 
-    def train(self):
-        data = get_dataset()
-        self.processed_data = pre_process_data(data)
-        features = self.processed_data.iloc[:, 1:].values
-        labels = self.processed_data['Disease'].values
-
-        #decisionTree = DecisionTreeClassifier(criterion='gini', random_state=42, max_depth=13)
-        randomForest = RandomForestClassifier()
-
-        model = Model('random_forest_model', randomForest, features, labels)
-        if not model.is_trained('random_forest_model'):
-            model.fit()
-            model.save()
-        self.model = model
-
-    def train_detail(self):
-        diabetes_data = get_diabetes_data()
-        diabetes_data = pre_process_diabetes_data(diabetes_data)
-        features = diabetes_data.drop(columns=['Outcome'])
-        labels = diabetes_data['Outcome']
-
-        model_pipeline = Pipeline([
-            ('scaler', MaxAbsScaler()),
-            ('classifier', ExtraTreesClassifier(verbose=0))
-        ])
-
-        detail_model = Model('extra_tree_classifier', model_pipeline, features, labels)
-        if not detail_model.is_trained('extra_tree_classifier'):
-            detail_model.fit()
-            detail_model.save()
-        self.detail_model = detail_model
-
     def ask_matching_symptoms(self, symptoms):
         df_severity = get_symptom_severity()
         df_severity['Symptom'] = df_severity['Symptom'].str.replace('_', ' ')

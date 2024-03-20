@@ -18,3 +18,8 @@ pip3 install -r requirment.txt
 cd diagnostic_assistant/gui
 python3 app.py
 ```
+
+# how to train the module
+```
+run train.ipynb
+```
