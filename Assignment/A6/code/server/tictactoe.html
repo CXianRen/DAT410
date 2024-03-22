@@ -1,0 +1,123 @@
+<!-- a template for tictactoe game, web, static html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+    <link rel="stylesheet" type="text/css" href="style.css">    
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 300px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .board {
+        border: 1px solid #000;
+        margin: 0 auto;
+    }
+
+    .row {
+        display: flex;
+    }
+
+    .cell {
+        width: 100px;
+        height: 100px;
+        border: 1px solid #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    .message {
+        margin-top: 10px;
+    }
+
+    #reset {
+        margin-top: 10px;
+        padding: 5px 10px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic Tac Toe</h1>
+        <div class="board">
+            <div class="row">
+                <div class="cell" id="cell-0"></div>
+                <div class="cell" id="cell-1"></div>
+                <div class="cell" id="cell-2"></div>
+            </div>
+            <div class="row">
+                <div class="cell" id="cell-3"></div>
+                <div class="cell" id="cell-4"></div>
+                <div class="cell" id="cell-5"></div>
+            </div>
+            <div class="row">
+                <div class="cell" id="cell-6"></div>
+                <div class="cell" id="cell-7"></div>
+                <div class="cell" id="cell-8"></div>
+            </div>
+        </div>
+        <div class="message" id="message"></div>
+        <button id="reset">Reset</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+<script>
+    player_1 = 1;
+    player_2 = 2;
+    player_1_lable = 'X';
+    player_2_lable = 'O';
+    current_player = player_1;
+
+    // one dimentional array to represent the chess box
+    chess_box = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+    
+    // Add event listener to the reset button
+    document.getElementById('reset').addEventListener('click', function() {
+        location.reload();
+    });
+    // monitor the click event on the cell
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+            console.log('cell clicked', cell.id);
+            // update the chess box
+            chess_box[parseInt(cell.id.split('-')[1])] = current_player; 
+            // update cell color acording to the current player
+            cell.textContent = current_player === player_1 ? player_1_lable : player_2_lable;
+            cell.style.color = current_player === player_1 ? 'red' : 'blue';
+            // switch player
+            current_player = current_player === player_1 ? player_2 : player_1;
+            // disable the cell
+            cell.style.pointerEvents = 'none'; 
+            
+            // send the chess box to the server, post request
+            fetch('/game', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chess_box: chess_box
+                })
+            })
+        });
+    });
+</script>
+</html>
+
